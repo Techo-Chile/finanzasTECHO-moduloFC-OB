@@ -3,6 +3,7 @@
 Agregar control de flujo para ajustar los datos al formato de la nomina"""
 from openpyxl import Workbook
 from openpyxl.styles import Font, Color, PatternFill, Border, Side
+from os.path import join, dirname, abspath
 
 class Writer:
   def __init__(self, filename, writeList = [], writeFormat = []):
@@ -10,10 +11,11 @@ class Writer:
 
     Args:
       filename (string)       : Fullpath del archivo
-      writeList (object[][])  : Arreglo de filas (cada fila es una lista de enteros)
-      writeFormat (int[])     : Arreglo de enteros en donde cada entero Y en la posición X 
+      writeList (object[][])  : Lista de filas (cada fila es una lista de objetos)
+      writeFormat (int[])     : Lista de enteros en donde cada entero Y en la posición X 
                                 indica que el elemento en posición Y de la lista writeList
-                                debe ir en la columna X (0-indexada) de la nomina de pago"""
+                                debe ir en la columna X (0-indexada) de la nomina de pago.
+                                Ciertos valores deben ser djeados en Nene (Cod Banco), Cuenta"""
     self.filename = filename
     self.format = writeFormat
     self.list = writeList
@@ -24,8 +26,8 @@ class Writer:
   def setFormatList(self, list):
     self.format = list
 
-  def write(self):
-    """Escribe en la nomina los datos del lista."""
+  def write(self, dbFileRows = [None]*7):
+    """Escribe en la nomina los datos de la lista."""
     if not self.list:
       print ("No ha definido una lista para escribir")
       return
@@ -34,12 +36,30 @@ class Writer:
       return
     wb = Workbook()
     ws = wb.active
+
+    # Column Header
+    self.writeHeader(ws);
+
+    #TODO: FORMAT LOGIC GOES HERE    
+    for row in self.list:
+      data = [None] * 7
+      for i in range(len(self.format)):
+        try:
+          data[i] = row[self.format[i]];
+        except TypeError: #Greedy, None index
+          continue
+      data = self.completeRow(data, dbFileRows)
+      ws.append(data)
+
+    wb.save(self.filename);
+
+  def writeHeader(self, ws):
     ws.append(['Rut Beneficiario', 'Nombre Beneficiario', 'Cod. Modalidad', 'Cod Banco',
       'Cta Abono', 'N Factura 1', 'Monto 1', 'N Factura 2', 'Monto 2', 'N Factura 3',
       'Monto 3', 'N Factura 3', 'Monto 4', 'N Factura 4', 'Monto 5', 'N Factura 5',
       'Monto 6', 'N Factura 6', 'Monto 7', 'N Factura 7', 'Monto 8', 'N Factura 8',
       'Monto 9', 'N Factura 9', 'Monto 10', 'N Factura 10', 'Monto 11', 'N Factura 11',
-      'Monto Total'])   
+      'Monto Total']) 
     sd = Side(border_style = 'thin', color = 'FF000000')
     for cell in ws["1:1"]:
       cell.font = Font(name='Arial', size = 9, color = 'FF0000FF')
@@ -54,6 +74,25 @@ class Writer:
     ws.column_dimensions["F"].width = 15
     ws.column_dimensions["AC"].width = 15
 
-    #TODO: FORMAT LOGIC GOES HERE
+  def completeRow(self, data, dbFileRows):
+    '''data[0] : RUT
+    data[1] : Nombre
+    data[2] : Codigo modalidad ---
+    data[3] : Cod Banco --
+    data[4] : Cuenta Abono --
+    data[5] : Factura
+    data[6] : Monto'''
+    ret = [None]*7
+    ret[0] = data[0].value
+    ret[1] = data[1].value
+    ret[2] = 3
+    for row in dbFileRows:
+      if row[0].value == data[0].value:
+        ret[3] = row[3].value
+        ret[4] = row[4].value    
+    ret[5] = data[5].value
+    ret[6] = data[6].value
+    print '-',
+    return ret
+  
 
-    wb.save(filename);
