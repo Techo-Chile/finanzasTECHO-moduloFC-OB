@@ -62,6 +62,13 @@ class Reader:
         ret.append(row);     
     return ret
 
+  def filterType(self, rowList, orderType, columnIndex):
+    ret = []
+    for row in rowList:
+      if orderType in row[columnIndex].value:
+        ret.append(row);
+    return ret
+
   def printSheet(self):
     """Imprime fila por fila la hoja activa.
 

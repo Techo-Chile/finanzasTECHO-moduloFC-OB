@@ -88,12 +88,15 @@ class Writer:
     ret[1] = data[1].value
     ret[2] = 3
     for row in dbFileRows:
-      if row[0].value == data[0].value:
-        ret[3] = row[3].value
-        try:
-          ret[4] = int(row[4].value)
-        except:
-          ret[4] = row[4].value
+      try:
+        if row[0].value[:-1] == data[0].value[:-1]:
+          ret[3] = row[3].value
+          try:
+            ret[4] = int(row[4].value)
+          except:
+            ret[4] = row[4].value
+      except:
+        continue
     ret[5] = data[5].value
     ret[6] = data[6].value
     ret[28] = ret[6]
