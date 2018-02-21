@@ -4,8 +4,8 @@ import datetime
 from datetime import date, time
 from os.path import join, dirname, abspath
 
-def printArray(array):
-  for e in array:
+def printList(list):
+  for e in list:
     print (e)
     print('-'*40)
 
@@ -16,12 +16,13 @@ def main():
   outputFile = join(dirname(dirname(abspath(__file__))), 'sample.xlsx') 
 
   rd = read.Reader(inputFile);
+  wr = write.Writer(outputFile);
 
   rd.setSheetByName('Proveedores');
 
-  # write.write(outputFile)
+  printList(rd.filterDate(rd.getRowList(), datetime.datetime.combine(d, t), 5))
 
-  printArray(rd.filterDate(rd.getRowArray(), datetime.datetime.combine(d, t), 5))
+  wr.write()
 
 if __name__ == "__main__":
   main()

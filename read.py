@@ -32,28 +32,28 @@ class Reader:
   def setSheetByName(self, name):
     self.xlrdSheet = self.xlrdWorkbook.sheet_by_name(name)
 
-  def getRowArray(self):
-    """Genera un arreglo de filas.
+  def getRowList(self):
+    """Genera una lista de filas.
 
     Returns:
-      object[][] : Arreglo de filas (cada fila es un arreglo de objetos)"""
+      object[][] : lista de filas (cada fila es una lista de objetos)"""
     ret = [];
     for rowInd in range(0, self.xlrdSheet.nrows):
       ret.append(self.xlrdSheet.row(rowInd))
     return ret
 
-  def filterDate(self, rowArray, dt, columnIndex):
-    """Retorna un arreglo de filas cuyas fechas de pago coinciden con el argumento.
+  def filterDate(self, rowList, dt, columnIndex):
+    """Retorna una lista de filas cuyas fechas de pago coinciden con el argumento.
 
     Args:
-      rowArray (obj[][])      : Arreglo de filas
+      rowList (obj[][])      : Lista de filas
       dt (datetime.datetime)  : Instancia de datetime.datetime
       columnIndex (int)       : Indice de la columna que contiene la fecha
 
     Returns:
-      object[][] : Arreglo de filas (cada fila es un arreglo de objetos)"""
+      object[][] : Lista de filas (cada fila es una fila de objetos)"""
     ret = []
-    for row in rowArray:
+    for row in rowList:
       try:
         py_date = toDatetime(row[columnIndex], self.xlrdWorkbook)
       except ValueError: #greedy: empty row
