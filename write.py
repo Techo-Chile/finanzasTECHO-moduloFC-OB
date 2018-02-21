@@ -49,7 +49,8 @@ class Writer:
         except TypeError: #Greedy, None index
           continue
       data = self.completeRow(data, dbFileRows)
-      ws.append(data)
+      if data[4]:
+        ws.append(data)
 
     wb.save(self.filename);
 
@@ -82,16 +83,20 @@ class Writer:
     data[4] : Cuenta Abono --
     data[5] : Factura
     data[6] : Monto'''
-    ret = [None]*7
+    ret = [None]*29
     ret[0] = data[0].value
     ret[1] = data[1].value
     ret[2] = 3
     for row in dbFileRows:
       if row[0].value == data[0].value:
         ret[3] = row[3].value
-        ret[4] = row[4].value    
+        try:
+          ret[4] = int(row[4].value)
+        except:
+          ret[4] = row[4].value
     ret[5] = data[5].value
     ret[6] = data[6].value
+    ret[28] = ret[6]
     print '-',
     return ret
   
