@@ -14,19 +14,19 @@ def printList(list):
 def main():
   #YYYY MM YY
   fecha = date(2018, 2, 16)
-  provider('sample.xlsx', 'OP', 8, fecha)
-  provider('sample2.xlsx', 'TDV', 8, fecha)
+  provider('sample.xlsx', 'OP', fecha)
+  provider('sample2.xlsx', 'TDV', fecha)
 
 def reembolsosMain():
   print 2
 
-def provider(outputName, opType, column, fecha):
+def provider(outputName, opType, fecha):
   """Genera la nomina para proveedores.
 
   Args:
     outputName (string) : full filepath del archivo de destino
     opType (string)     : tipo de operación ('OP', 'TDV', etc)
-    column ("""
+    fecha (date.date)   : fecha a filtrar"""
   
   hora = time(0, 0)
   
@@ -34,7 +34,7 @@ def provider(outputName, opType, column, fecha):
   inputFileReader = read.Reader(inputFile);
   inputFileReader.setSheetByName('Proveedores');
   lst = inputFileReader.filterDate(inputFileReader.getRowList(), datetime.datetime.combine(fecha, hora), 5)
-  lst = inputFileReader.filterType(lst, opType, column)
+  lst = inputFileReader.filterType(lst, opType, 8)
 
   printList(lst)
 
