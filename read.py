@@ -46,7 +46,7 @@ class Reader:
     """Retorna una lista de filas cuyas fechas de pago coinciden con el argumento.
 
     Args:
-      rowList (obj[][])      : Lista de filas
+      rowList (obj[][])       : Lista de filas
       dt (datetime.datetime)  : Instancia de datetime.datetime
       columnIndex (int)       : Indice de la columna que contiene la fecha
 
@@ -63,6 +63,13 @@ class Reader:
     return ret
 
   def filterType(self, rowList, orderType, columnIndex):
+    """Retorna una lista de filas cuyos tipos de orden (OP, TDV, etc) coinciden
+    con el argumento.
+
+    Args:
+      rowList (obj[][])       : Lista de filas
+      orderType (string)      : Tipo de orden de compra
+      columnIndex (int)       : Indice de la columna que contiene el tipo"""
     ret = []
     for row in rowList:
       if orderType in row[columnIndex].value:
