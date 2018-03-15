@@ -142,6 +142,7 @@ def provider(outputName, opType, fecha, output_folder):
 
 def load_properties():
     config = configparser.ConfigParser()
+    config = configparser.ConfigParser()
     config.sections()
     config.read(join(dirname(abspath(__file__)), 'finanzas.win.ini' if os.name == 'nt' else 'finanzas.linux.ini'))
     return config
@@ -155,7 +156,7 @@ def copy_base_files(propertiesMap):
     employees_file = propertiesMap['init']['employees_file']
 
     #Validación de conectividad con server
-    if(os.path.exists(proveed_file)):
+    if(not os.path.exists(proveed_file)):
         print("No se pueden recuperar los archivos de BODEGA (Abrí primero la carpeta manualmente e intentá nuevamente)")
         sys.exit(0)
 
