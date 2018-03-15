@@ -143,6 +143,7 @@ def provider(outputName, opType, fecha, output_folder):
 def load_properties():
     config = configparser.ConfigParser()
     config.sections()
+    print (os.name)
     config.read(join(dirname(abspath(__file__)),  'finanzas.linux.ini' if os.name == 'nt' else 'finanzas.win.ini'))
     return config
 
