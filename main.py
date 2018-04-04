@@ -3,7 +3,7 @@
   write.write() requiere reformatting para permitir el uso de una base de datos de RUTS y hacer string matching
   con los nombres.
 """
-import filters, write
+import utils, write
 import datetime
 from datetime import date, time
 from os.path import join, dirname, abspath
@@ -21,47 +21,31 @@ def main():
 
     #Carga propiedades
     configSectionMap = load_properties()
-    #Validación de fecha
-    ref_date = configSectionMap['init']['reference_date']
-    if (ref_date == 'today'):
-        fecha = datetime.datetime.now().date()
+    
+    #reemb_typeidación de semana del año
+    ref_week = configSectionMap['init']['week_reference']
+    if (ref_week == 'current_week'):
+        year = int(datetime.datetime.now().isocalendar()[0])
+        week = int(datetime.datetime.now().isocalendar()[1])
+        weekday = 1 #Indicamos el inicio de semana
     else:
-        fecha = date(
-            int(ref_date.split('/')[0]), int(ref_date.split('/')[1]),
-            int(ref_date.split('/')[2]))
+        year = int(datetime.datetime.now().isocalendar()[0])
+        week = int(ref_week)
+        weekday = 1
 
-    output_folder = join(configSectionMap['init']['output_folder'],
+    output_folder_name = join(configSectionMap['init']['output_folder'],
                          datetime.datetime.now().strftime("%Y-%m-%d %H%M%S"))
 
-    if (not os.path.exists(output_folder)):
-        os.makedirs(output_folder)
-
-    '''
-      Ejecución de archivos de nómina:
-        1. Nomina Dev. socios semana 09 - 26 al 02 marzo
-        2. Nomina FPR Operacionales semana 09 - 26 al 02 marzo
-        
-        #--2/4/18: Se cambia el manejo de proveedores por la solución de 2WIN
-        3. Nomina Proveedores Operacionales semana  09 - 26 al 02 marzo
-        4. Nomina Proveedores TDV semana  09 - 26 al 02 marzo
-        
-        #--2/4/18: Se cambia el manejo de proveedores por la solución de 2WIN
-        5. Nomina Reembolsos Operacionales semana 09 - 26 al 02 marzo
-        6. Nomina Reembolsos TDE semana 09 - 26 al 02 marzo
-        7. Nomina Reembolsos TDV semana 09 - 26 al 02 marzo
-    '''
-
-    #Data para nombre de archivos
-    week_of_year = fecha.isocalendar()[1]
+    if (not os.path.exists(output_folder_name)):
+        os.makedirs(output_folder_name)
 
     #Inicio de Semana
-    week_monday = fecha + datetime.timedelta(days=-fecha.weekday())
+    week_monday = utils.ywd_to_date(year, week, weekday)
     mont_init = calendar.month_name[week_monday.month]
 
     #Fin de la semana
-    week_friday = fecha + datetime.timedelta(
-        days=-fecha.weekday()) + timedelta(days=5)
-    mont_end = calendar.month_name[week_friday.month]
+    week_friday = week_monday + timedelta(days=4)
+    month_end = calendar.month_name[week_friday.month]
 
     #Obtenemos las tablas de GSheets - Leemos una sola vez
     reembolsos_table = get_worksheet(configSectionMap['init']['flujo_caja_url'], configSectionMap['init']['Reembolsos_worksheet_name'])
@@ -69,28 +53,36 @@ def main():
     
     #Recorremos por los types de reembolsos configurados
     reemb_types = configSectionMap['init']['reemb_types'].split(',') 
-    for val in reemb_types:
-        reembolsos(reembolsos_table, personas_table, 'Nómina Reembolsos {} Semana {} - {} {} to {} {}.xlsx'.format(val,
-        week_of_year, mont_init, week_monday, mont_end, week_friday), val,
-               fecha, output_folder, configSectionMap)
+    for reemb_type in reemb_types:
+        output_file_name = 'Nómina Reembolsos {} Semana {} - {} {} to {} {}.xlsx'.format(reemb_type, week, mont_init, week_monday, month_end, week_friday)
+        filtered_reemb = filter_reemb(reembolsos_table, reemb_type, week_monday, week_friday)
+        if(len(filtered_reemb) > 0):
+            writeReembfile(filtered_reemb, personas_table, output_file_name, output_folder_name)
+        else:
+            print('No se encuentran registros para type {}, archivo no generado'.format(reemb_type))
 
-def reembolsos(reembolsos_table, personas_table, outputName, opType, fecha, output_folder, configSectionMap):
+def filter_reemb(reembolsos_table, opType, date_ini, date_end):
+    lst = []
     try:
         #Filtramos por fecha
-        lst = filters.filterDate(reembolsos_table,
-                                         datetime.datetime.combine(
-                                             fecha, time(0, 0)), 5)
-        lst = filters.filterType(lst, opType, 6)
-        #Identificamos cuáles son reembolsos
-        lst = filters.filterReemb(lst)
-        #Obtenemos nombre de archivo de salida
-        outputFile = join(output_folder, outputName)
-        #Escribimos el archivo con el formato
+        lst = utils.filterDate(reembolsos_table, date_ini, date_end, 5)
+        #Filtramos por tipo de reembolso
+        lst = utils.filterType(lst, opType, 6)
+        #Filtramos por fecha
+        lst = utils.filterReemb(lst)
+    except Exception as inst:
+        print('Error filtrando reembolsos - Causa {}'.format(inst))
+    return lst
+
+def writeReembfile(filtered_list, personas_table, output_file_name, output_folder_name):
+    try:
+        outputFile = join(output_folder_name, output_file_name)
         outputFileWriter = write.Writer()
-        outputFileWriter.write_reembolso(lst, outputFile, personas_table)
+        outputFileWriter.write_reembolso(filtered_list, outputFile, personas_table)
         print('Archivo generado: {}'.format(outputFile))
     except Exception as inst:
         print('Error generando archivo {} - Causa {}'.format(outputFile, inst))
+    
 
 def load_properties():
     config = configparser.ConfigParser()
@@ -109,7 +101,6 @@ def get_worksheet(source_url, worksheetName):
     except Exception as e: 
         print(e)
         return None
-
 
 if __name__ == "__main__":
     main()

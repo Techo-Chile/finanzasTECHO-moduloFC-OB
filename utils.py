@@ -1,16 +1,16 @@
-from datetime import datetime  
+from datetime import date
 from datetime import timedelta 
 from datetime import datetime
 
 
-def filterDate(rowList, dt, columnIndex):
+def filterDate(rowList, date_init, date_end, columnIndex):
         ret = []
         for row in rowList:
             try:
-                d = datetime.strptime(str(row[columnIndex]), '%m/%d/%Y')
+                d = datetime.strptime(str(row[columnIndex]), '%d/%m/%Y').date()
             except ValueError:
                 continue
-            if (dt == d) | (dt - timedelta(days=7) < d):
+            if date_init <= d <= date_end:
                 ret.append(row)
         return ret
 
@@ -30,3 +30,10 @@ def filterReemb(rowList):
             except Exception:
               continue
         return ret
+
+def ywd_to_date(year, week, weekday):
+    first = date(year, 1, 1)
+    first_year, _first_week, first_weekday = first.isocalendar()
+    if first_year == year:
+        week -= 1
+    return first + timedelta(days=week*7+weekday-first_weekday)
