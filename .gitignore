@@ -2,3 +2,5 @@ __pycache__/
 build/
 dist/
 app.spec
+client_secret.json
+client_secret_255965529247-tvouvtgd0g5u0v16du9nqmq0na2ouecu.apps.googleusercontent.com.json

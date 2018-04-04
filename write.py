@@ -4,6 +4,7 @@ Agregar control de flujo para ajustar los datos al formato de la nomina"""
 from openpyxl import Workbook
 from openpyxl.styles import Font, Color, PatternFill, Border, Side
 from os.path import join, dirname, abspath
+import re
 
 class Writer:
     def __init__(self, writeList=[], writeFormat=[]):
@@ -20,7 +21,7 @@ class Writer:
         '''Formato OB: RUT, Nombre, Modalidad, Código Banco, Cuenta, NFactura, Monto'''
         #self.FORMAT_PROVEEDOR = [0, 1, '3', 16, 17, 2, 3]
         self.FORMAT_PROVEEDOR = [0, 1, '3', 16, 17, 2, 3]
-        self.FORMAT_REEMBOLSO = [0, 1, '3', 16, 17, 2, 3]
+        self.FORMAT_REEMBOLSO = [26, 27, 28, 29, 30, 'rowInd', 4]
 
     def write_provider(self,
                        filteredList,
@@ -49,7 +50,7 @@ class Writer:
         for row in filteredList:
             try:
                 for rowProveed in dbFileRows:
-                    if str(row[0].value) in str(rowProveed[0].value):
+                    if str(row[2]) in str(rowProveed[0]):
                         ret.append(row + rowProveed)
                         #ret.append(row)
                         break
@@ -59,13 +60,19 @@ class Writer:
     
     def get_file_content(self, outputFileContent, joinedList, format):
         newRow = [None] * 29
-        for row in joinedList:
+        for c,row in enumerate(joinedList):
             for rowInd in range(0, len(format)):
-                if(isinstance(format[rowInd], str)):
+                if('rowInd' in str(format[rowInd])):
+                    newRow[rowInd] = c
+                elif(isinstance(format[rowInd], str)):
                     newRow[rowInd] = format[rowInd]
                 else:
-                    newRow[rowInd] = row[format[rowInd]].value
-            newRow[28] = row[3].value
+                    val = row[format[rowInd]]
+                    if '$' in val:
+                        val = re.sub("[^0-9]", "", val)
+                        row[format[rowInd]] = val
+                    newRow[rowInd] = val
+            newRow[28] = row[4]
             outputFileContent.append(newRow)
         return outputFileContent
 
