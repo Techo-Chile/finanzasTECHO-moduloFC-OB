@@ -16,6 +16,7 @@ import sys, traceback
 import pygsheets, oauth2client
 from oauth2client.service_account import ServiceAccountCredentials
 import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 
 def main():
 
@@ -93,10 +94,12 @@ def load_properties():
 
 def get_worksheet(source_url, worksheetName):
     try:
-        client = pygsheets.authorize(outh_file=join(dirname(abspath(__file__)),'client_secret.json'), outh_nonlocal=True)
+        scope = ['https://spreadsheets.google.com/feeds']
+        creds = ServiceAccountCredentials.from_json_keyfile_name(join(dirname(abspath(__file__)),'client_secret.json'), scope)
+        client = gspread.authorize(creds)
         spreadsheet = client.open_by_url(source_url)
-        worksheet = spreadsheet.worksheet_by_title(worksheetName)
-        rows = worksheet.get_all_values(returnas='matrix', majdim='ROWS', include_empty=True)
+        worksheet = spreadsheet.worksheet(worksheetName)
+        rows = worksheet.get_all_values()
         return rows
     except Exception as e: 
         print(e)
