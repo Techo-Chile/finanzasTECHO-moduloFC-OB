@@ -32,6 +32,7 @@ class Writer:
         ws = wb.active
         self.writeHeader(ws)
         joinedList = self.join_listsByRut(personas_list, filtered_reemb)
+        ws.title = 'Hoja1'
         ws = self.get_file_content(ws, joinedList)
         wb.save(outputFileName)
 

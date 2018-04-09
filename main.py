@@ -1,8 +1,4 @@
 0  # -*- coding: utf-8 -*-
-"""TODO:
-  write.write() requiere reformatting para permitir el uso de una base de datos de RUTS y hacer string matching
-  con los nombres.
-"""
 import utils, write
 import datetime
 from datetime import date, time
@@ -55,7 +51,7 @@ def main():
     #Recorremos por los types de reembolsos configurados
     reemb_types = configSectionMap['init']['reemb_types'].split(',') 
     for reemb_type in reemb_types:
-        output_file_name = 'Nómina Reembolsos {} Semana {} - {} {} to {} {}.xlsx'.format(reemb_type, week, mont_init, week_monday, month_end, week_friday)
+        output_file_name = 'Nómina Reembolsos {} Semana {} - {} {} to {} {}.xls'.format(reemb_type, week, mont_init, week_monday, month_end, week_friday)
         filtered_reemb = filter_reemb(reembolsos_table, reemb_type, week_monday, week_friday)
         if(len(filtered_reemb) > 0):
             writeReembfile(filtered_reemb, personas_table, output_file_name, output_folder_name)
