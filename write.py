@@ -39,12 +39,15 @@ class Writer:
     def join_listsByRut(self, dbFileRows, filteredList):
         ret = []
         for row in filteredList:
+            flag = False
             try:
                 for rowProveed in dbFileRows:
                     if str(row[2]) in str(rowProveed[0]):
                         ret.append(row + rowProveed)
-                        #ret.append(row)
+                        flag = True
                         break
+                if not flag:
+                    print('RUT {} no encontrado en archivo de personas'.format(row[2]))
             except Exception:
                 continue
         return ret

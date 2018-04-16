@@ -52,11 +52,15 @@ def main():
     reemb_types = configSectionMap['init']['reemb_types'].split(',') 
     for reemb_type in reemb_types:
         output_file_name = 'Nómina Reembolsos {} Semana {} - {} {} to {} {}.xls'.format(reemb_type, week, mont_init, week_monday, month_end, week_friday)
+        print('Generando archivo {}'.format(output_file_name))
         filtered_reemb = filter_reemb(reembolsos_table, reemb_type, week_monday, week_friday)
         if(len(filtered_reemb) > 0):
             writeReembfile(filtered_reemb, personas_table, output_file_name, output_folder_name)
         else:
             print('No se encuentran registros para type {}, archivo no generado'.format(reemb_type))
+    
+    #Fin de la ejecución:
+    text = input("Enter para finalizar") 
 
 def filter_reemb(reembolsos_table, opType, date_ini, date_end):
     lst = []
@@ -76,7 +80,7 @@ def writeReembfile(filtered_list, personas_table, output_file_name, output_folde
         outputFile = join(output_folder_name, output_file_name)
         outputFileWriter = write.Writer()
         outputFileWriter.write_reembolso(filtered_list, outputFile, personas_table)
-        print('Archivo generado: {}'.format(outputFile))
+        print('Archivo generado')
     except Exception as inst:
         print('Error generando archivo {} - Causa {}'.format(outputFile, inst))
     
