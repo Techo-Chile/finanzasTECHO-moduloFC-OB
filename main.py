@@ -1,4 +1,4 @@
-0  # -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 import utils, write
 import datetime
 from datetime import date, time
@@ -97,7 +97,7 @@ def get_worksheet(source_url, worksheetName):
         scope = ['https://spreadsheets.google.com/feeds']
         creds = ServiceAccountCredentials.from_json_keyfile_name(join(dirname(abspath(__file__)),'client_secret.json'), scope)
         client = gspread.authorize(creds)
-        spreadsheet = client.open_by_url(source_url)
+        spreadsheet = client.open_by_key(source_url)
         worksheet = spreadsheet.worksheet(worksheetName)
         rows = worksheet.get_all_values()
         return rows
