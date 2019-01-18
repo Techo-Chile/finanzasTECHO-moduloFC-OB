@@ -15,10 +15,8 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
 def main():
-
     #Carga propiedades
     configSectionMap = load_properties()
-    
     #reemb_typeidación de semana del año
     ref_week = configSectionMap['init']['week_reference']
     if (ref_week == 'current_week'):
@@ -60,7 +58,7 @@ def main():
             print('No se encuentran registros para type {}, archivo no generado'.format(reemb_type))
     
     #Fin de la ejecución:
-    text = input("Enter para finalizar") 
+    text = input("Enter para finalizar")
 
 def filter_reemb(reembolsos_table, opType, date_ini, date_end):
     lst = []
@@ -83,7 +81,6 @@ def writeReembfile(filtered_list, personas_table, output_file_name, output_folde
         print('Archivo generado')
     except Exception as inst:
         print('Error generando archivo {} - Causa {}'.format(outputFile, inst))
-    
 
 def load_properties():
     config = configparser.ConfigParser()
