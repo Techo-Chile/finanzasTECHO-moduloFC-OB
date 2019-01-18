@@ -76,8 +76,8 @@ def filter_reemb(reembolsos_table, opType, date_ini, date_end):
     return lst
 
 def writeReembfile(filtered_list, personas_table, output_file_name, output_folder_name):
+    outputFile = join(output_folder_name, output_file_name)
     try:
-        outputFile = join(output_folder_name, output_file_name)
         outputFileWriter = write.Writer()
         outputFileWriter.write_reembolso(filtered_list, outputFile, personas_table)
         print('Archivo generado')
