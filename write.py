@@ -21,7 +21,7 @@ class Writer:
         '''Formato OB: RUT, Nombre, Modalidad, Código Banco, Cuenta, NFactura, Monto'''
         #self.FORMAT_PROVEEDOR = [0, 1, '3', 16, 17, 2, 3]
         self.FORMAT_PROVEEDOR = [0, 1, '3', 16, 17, 2, 3]
-        self.FORMAT_REEMBOLSO = [15, 16, 17, 18, 19, 'rowInd', 4]
+        self.FORMAT_REEMBOLSO = [8, 9, 10, 11, 12, 'rowInd', 4]
         self.FORMAT_REEMBOLSO_FORMATS = ['str', 'str', 'int', 'int', 'str', 'int', 'int']
 
     def write_reembolso(self,
@@ -61,7 +61,7 @@ class Writer:
                 elif(isinstance(self.FORMAT_REEMBOLSO[rowInd], str)):
                     val = self.FORMAT_REEMBOLSO[rowInd]
                 else:
-                    val = row[self.FORMAT_REEMBOLSO[rowInd]]
+                    val = row[self.FORMAT_REEMBOLSO[rowInd]].encode('utf-8').strip()
                     if '$' in val:
                         val = re.sub("[^0-9]", "", val)
                         row[rowInd] = val

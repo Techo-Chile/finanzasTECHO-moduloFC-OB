@@ -51,7 +51,7 @@ def main():
     #Recorremos por los types de reembolsos configurados
     reemb_types = configSectionMap['init']['reemb_types'].split(',') 
     for reemb_type in reemb_types:
-        output_file_name = 'Nómina Reembolsos {} Semana {} - {} {} to {} {}.xls'.format(reemb_type, week, mont_init, week_monday, month_end, week_friday)
+        output_file_name = 'Nomina Reembolsos {} Semana {} - {} {} to {} {}.xls'.format(reemb_type, week, mont_init, week_monday, month_end, week_friday)
         print('Generando archivo {}'.format(output_file_name))
         filtered_reemb = filter_reemb(reembolsos_table, reemb_type, week_monday, week_friday)
         if(len(filtered_reemb) > 0):
